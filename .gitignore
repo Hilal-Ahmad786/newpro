@@ -1,9 +1,15 @@
-venv
-.idea
-constants.py
-data/
-tinderbotz.egg-info
-dist
-build
+# Python
+venv/
+.env*
 __pycache__/
-chrome_profile/
+*.pyc
+
+# Node/General
+node_modules/
+dist/
+.build/
+.next/
+*.log
+
+# macOS
+.DS_Store
