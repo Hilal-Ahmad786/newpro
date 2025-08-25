@@ -1,17 +1,22 @@
-# Core dependencies (optimized & secured)
+# Core dependencies for Hilal's Smart Dating Bot
 selenium==4.15.0
-undetected-chromedriver==3.5.4
+undetected-chromedriver>=3.5.0
 webdriver-manager==4.0.1
 
-# Image processing (optional, can remove if not scraping)
-Pillow==10.3.0
-opencv-python==4.8.1.78
-numpy==1.24.3
-
-# AI face analysis (optional, can remove if not needed)
-deepface==0.0.79
-
-# Security & Environment
+# Environment & Security
 python-dotenv==1.0.0
 cryptography==41.0.7
 requests==2.31.0
+
+# Optional: Image processing (only if using profile scraping)
+Pillow>=10.0.0
+
+# Optional: Data analysis (only if using advanced features)
+numpy>=1.24.0
+
+# Optional: AI face analysis (only if using deepface features)
+# deepface==0.0.79
+# opencv-python==4.8.1.78
+
+# Note: Commented out heavy dependencies that aren't essential
+# Uncomment only if you need advanced image analysis features

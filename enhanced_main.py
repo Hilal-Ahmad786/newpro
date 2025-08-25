@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
-🤖 Hilal's Smart Dating Bot - Working Version
-Fixed Chrome errors and integrated location changing
+🤖 Hilal's Smart Dating Bot - Enhanced Version
+Now with automatic location changing and smart detection
 """
 import os
 import sys
 import time
-import random
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -14,34 +13,57 @@ from tinderbotz.session import Session
 from tinderbotz.helpers.constants_helper import Sexuality
 
 def main():
-    print("🤖 HILAL'S SMART DATING BOT - WORKING VERSION")
+    print("🤖 HILAL'S SMART DATING BOT - ENHANCED")
     print("="*60)
-    print("✅ Fixed Chrome driver errors")
-    print("🇹🇷 Turkey-First Location Priorities") 
+    print("🇹🇷 Auto Location Change - Turkey Priority")
+    print("🤖 Smart Detection - No More Stuck Sessions")
     print("⚡ Ultra-Fast Swiping (0.5-2 sec delays)")
     print("🔒 Maximum Privacy (Incognito Mode)")
-    print("🌍 Auto Location Change (When Available)")
     print("="*60)
     
-    # Turkey-first city list
+    # Turkey-first city list (prioritized order)
     TURKEY_CITIES = [
-        "Istanbul, Turkey", "Ankara, Turkey", "Izmir, Turkey",
-        "Bursa, Turkey", "Antalya, Turkey", "Adana, Turkey", 
-        "Konya, Turkey", "Gaziantep, Turkey", "Mersin, Turkey"
+        "Istanbul, Turkey",
+        "Ankara, Turkey", 
+        "Izmir, Turkey",
+        "Bursa, Turkey",
+        "Antalya, Turkey",
+        "Adana, Turkey",
+        "Konya, Turkey",
+        "Gaziantep, Turkey",
+        "Mersin, Turkey",
+        "Kayseri, Turkey",
+        "Eskisehir, Turkey",
+        "Bodrum, Turkey",
+        "Marmaris, Turkey",
+        "Fethiye, Turkey",
+        "Alanya, Turkey"
     ]
     
     INTERNATIONAL_CITIES = [
-        "London, UK", "Paris, France", "Berlin, Germany",
-        "Amsterdam, Netherlands", "Barcelona, Spain", "Dubai, UAE"
+        "London, UK",
+        "Paris, France", 
+        "Berlin, Germany",
+        "Amsterdam, Netherlands",
+        "Barcelona, Spain",
+        "Madrid, Spain",
+        "Rome, Italy",
+        "Vienna, Austria",
+        "Prague, Czech Republic",
+        "Dubai, UAE",
+        "New York, USA",
+        "Los Angeles, USA",
+        "Miami, USA",
+        "Toronto, Canada"
     ]
     
-    # Create session with fixed Chrome options
+    # Create session in INCOGNITO mode
     session = Session(headless=False, store_session=False, incognito=True)
     
     # Login options
     print("\n🔑 Choose your login method:")
     print("1. 🔴 Manual login (RECOMMENDED - Most Secure)")
-    print("2. 🟠 Google login (Auto)")  
+    print("2. 🟠 Google login (Auto)")
     print("3. 🔵 Facebook login (Auto)")
     
     while True:
@@ -69,23 +91,24 @@ def main():
     print("\n✅ LOGIN SUCCESSFUL! 🎉")
     print("🤖 Enhanced Hilal's Dating Bot is ready!")
     
-    # Get the enhanced helper  
+    # Get the enhanced helper
     from tinderbotz.helpers.geomatch_helper import GeomatchHelper
     geomatch_helper = GeomatchHelper(session.browser)
     
     # Main menu loop
     while True:
         print("\n" + "="*60)
-        print("🤖 HILAL'S SMART DATING BOT - WORKING VERSION")
+        print("🤖 HILAL'S ENHANCED SMART DATING BOT")
         print("="*60)
         print("1. 🚀 Quick Swipe (Current Location)")
-        print("2. 🇹🇷 Smart Turkey Mode (with Location Change)")
-        print("3. 🌍 Smart International Mode") 
-        print("4. 🎯 Manual Location Test")
-        print("5. ⚙️ Settings & Preferences")
-        print("6. 💬 Check New Matches")
-        print("7. 🧪 Test Enhanced Features")
-        print("8. 🚪 Exit")
+        print("2. 🇹🇷 Smart Turkey Mode (Auto Location Change)")
+        print("3. 🌍 Smart International Mode (Auto Location Change)")
+        print("4. 🎯 Custom Smart Session")
+        print("5. 📍 Manual Location Change")
+        print("6. ⚙️ Settings & Preferences") 
+        print("7. 💬 Check New Matches")
+        print("8. 🧪 Test Features")
+        print("9. 🚪 Exit")
         print("="*60)
         
         action = input("👉 Your choice: ").strip()
@@ -120,122 +143,162 @@ def main():
                         likes += 1
                         print(f"   👍 {swipes + 1}/{amount}: Liked")
                     else:
-                        print(f"   ⚠️ Like button not available - may be out of profiles")
+                        print(f"   ⚠️ Like button not available - stopping")
                         break
                 else:
                     if geomatch_helper.dislike():
-                        dislikes += 1
+                        dislikes += 1  
                         print(f"   👎 {swipes + 1}/{amount}: Disliked")
                     else:
-                        print(f"   ⚠️ Dislike button not available")
+                        print(f"   ⚠️ Dislike button not available - stopping")
                         break
                 
                 swipes += 1
                 
                 # Smart delay
+                import random
                 delay = random.uniform(0.5, 2.0)
                 time.sleep(delay)
                 
                 # Progress every 10 swipes
                 if swipes % 10 == 0:
-                    rate = (likes / swipes) * 100 if swipes > 0 else 0
+                    rate = (likes / swipes) * 100
                     print(f"   📊 Progress: {swipes}/{amount} | Likes: {likes} | Rate: {rate:.1f}%")
             
             print(f"\n✅ Quick swipe completed: {swipes} swipes, {likes} likes, {dislikes} dislikes")
             
         elif action == '2':
-            # Smart Turkey mode
+            # Smart Turkey mode with auto location changing
             print("\n🇹🇷 SMART TURKEY MODE")
-            print("This mode will attempt location changes (requires Tinder Plus/Passport)")
+            print("This mode automatically changes location when out of matches!")
             
-            num_cities = input(f"Number of Turkish cities (1-{len(TURKEY_CITIES)}): ").strip()
-            num_cities = min(int(num_cities) if num_cities.isdigit() else 3, len(TURKEY_CITIES))
+            num_cities = input(f"Number of Turkish cities to visit (1-{len(TURKEY_CITIES)}): ").strip()
+            num_cities = min(int(num_cities) if num_cities.isdigit() else 5, len(TURKEY_CITIES))
             
-            swipes_per_city = input("Swipes per city (default: 20): ").strip()
-            swipes_per_city = int(swipes_per_city) if swipes_per_city.isdigit() else 20
+            swipes_per_city = input("Swipes per city (default: 25): ").strip()  
+            swipes_per_city = int(swipes_per_city) if swipes_per_city.isdigit() else 25
             
             selected_cities = TURKEY_CITIES[:num_cities]
             
             print(f"\n🚀 Starting Smart Turkey Session:")
             print(f"   🌍 Cities: {selected_cities}")
             print(f"   👍 Swipes per city: {swipes_per_city}")
-            print(f"   ⚠️  Location change requires Tinder Plus/Passport")
             
             confirm = input("\nStart Smart Turkey Session? (y/n): ").lower()
             if confirm == 'y':
-                try:
-                    stats = geomatch_helper.smart_swipe_session(selected_cities, swipes_per_city)
-                    print(f"\n🇹🇷 TURKEY SESSION COMPLETED:")
-                    for key, value in stats.items():
-                        print(f"   {key.replace('_', ' ').title()}: {value}")
-                except Exception as e:
-                    print(f"❌ Session error: {e}")
-                    print("💡 Try option 1 (Quick Swipe) for basic functionality")
+                stats = geomatch_helper.smart_swipe_session(selected_cities, swipes_per_city)
+                print(f"\n🇹🇷 TURKEY SESSION STATS:")
+                for key, value in stats.items():
+                    print(f"   {key.replace('_', ' ').title()}: {value}")
             
         elif action == '3':
             # Smart international mode
             print("\n🌍 SMART INTERNATIONAL MODE")
-            print("Global cities with location changing")
+            print("Global cities with automatic location changing!")
             
-            num_cities = input(f"Number of cities (1-{len(INTERNATIONAL_CITIES)}): ").strip()
-            num_cities = min(int(num_cities) if num_cities.isdigit() else 3, len(INTERNATIONAL_CITIES))
+            num_cities = input(f"Number of international cities (1-{len(INTERNATIONAL_CITIES)}): ").strip()
+            num_cities = min(int(num_cities) if num_cities.isdigit() else 5, len(INTERNATIONAL_CITIES))
             
-            swipes_per_city = input("Swipes per city (default: 15): ").strip()
-            swipes_per_city = int(swipes_per_city) if swipes_per_city.isdigit() else 15
+            swipes_per_city = input("Swipes per city (default: 20): ").strip()
+            swipes_per_city = int(swipes_per_city) if swipes_per_city.isdigit() else 20
             
             selected_cities = INTERNATIONAL_CITIES[:num_cities]
             
-            confirm = input(f"\nStart with {selected_cities}? (y/n): ").lower()
+            print(f"\n🚀 Starting Smart International Session:")
+            print(f"   🌍 Cities: {selected_cities}")
+            print(f"   👍 Swipes per city: {swipes_per_city}")
+            
+            confirm = input("\nStart International Session? (y/n): ").lower()
             if confirm == 'y':
                 # Enable global mode first
                 session.set_global(True)
-                try:
-                    stats = geomatch_helper.smart_swipe_session(selected_cities, swipes_per_city)
-                    print(f"\n🌍 INTERNATIONAL SESSION COMPLETED:")
-                    for key, value in stats.items():
-                        print(f"   {key.replace('_', ' ').title()}: {value}")
-                except Exception as e:
-                    print(f"❌ Session error: {e}")
-                    print("💡 Location changing requires Tinder Passport subscription")
+                stats = geomatch_helper.smart_swipe_session(selected_cities, swipes_per_city)
+                print(f"\n🌍 INTERNATIONAL SESSION STATS:")
+                for key, value in stats.items():
+                    print(f"   {key.replace('_', ' ').title()}: {value}")
             
         elif action == '4':
-            # Manual location test
-            print("\n📍 MANUAL LOCATION TEST")
-            print("Test location changing feature")
+            # Custom smart session
+            print("\n🎯 CUSTOM SMART SESSION")
+            print("Create your own city list and settings!")
             
-            print("\nQuick test cities:")
-            test_cities = ["Istanbul, Turkey", "London, UK", "Berlin, Germany"]
-            for i, city in enumerate(test_cities, 1):
-                print(f"   {i}. {city}")
+            # Choose region
+            print("\nSelect region type:")
+            print("1. Turkey cities only")
+            print("2. International cities only")
+            print("3. Mixed (Turkey + International)")
             
-            choice = input("\nEnter number (1-3) or type custom city: ").strip()
+            region_choice = input("Region choice (1-3): ").strip()
             
-            if choice.isdigit() and 1 <= int(choice) <= 3:
-                city_name = test_cities[int(choice) - 1]
+            if region_choice == '1':
+                available_cities = TURKEY_CITIES
+                print(f"\n🇹🇷 Available Turkish cities: {len(available_cities)}")
+            elif region_choice == '2':
+                available_cities = INTERNATIONAL_CITIES
+                print(f"\n🌍 Available international cities: {len(available_cities)}")
             else:
-                city_name = choice if choice else "Istanbul, Turkey"
+                available_cities = TURKEY_CITIES + INTERNATIONAL_CITIES
+                print(f"\n🌍 Available mixed cities: {len(available_cities)}")
             
-            print(f"\n🌍 Testing location change to: {city_name}")
-            print("⚠️ This requires Tinder Plus/Passport subscription")
+            # Show city options
+            print("\nFirst 10 cities:")
+            for i, city in enumerate(available_cities[:10], 1):
+                print(f"   {i}. {city}")
+            if len(available_cities) > 10:
+                print(f"   ... and {len(available_cities) - 10} more")
             
-            proceed = input("Proceed with test? (y/n): ").lower()
-            if proceed == 'y':
-                if geomatch_helper.change_location(city_name):
-                    print("✅ Location change test successful!")
-                    print("💡 You can now use Smart Turkey/International modes")
-                else:
-                    print("❌ Location change test failed")
-                    print("💡 Possible reasons:")
-                    print("   - No Tinder Plus/Passport subscription")
-                    print("   - Tinder interface changes")
-                    print("   - Network connectivity issues")
+            num_cities = input(f"\nNumber of cities to visit (1-{min(15, len(available_cities))}): ").strip()
+            num_cities = min(int(num_cities) if num_cities.isdigit() else 5, len(available_cities))
+            
+            swipes_per_city = input("Swipes per city (10-50): ").strip()
+            swipes_per_city = max(10, min(50, int(swipes_per_city) if swipes_per_city.isdigit() else 25))
+            
+            selected_cities = available_cities[:num_cities]
+            
+            print(f"\n🎯 Custom session configured:")
+            print(f"   🌍 Cities: {num_cities} cities")
+            print(f"   👍 Swipes per city: {swipes_per_city}")
+            print(f"   📊 Total estimated swipes: {num_cities * swipes_per_city}")
+            
+            confirm = input("\nStart custom session? (y/n): ").lower()
+            if confirm == 'y':
+                if region_choice == '2':  # International only
+                    session.set_global(True)
+                stats = geomatch_helper.smart_swipe_session(selected_cities, swipes_per_city)
+                print(f"\n🎯 CUSTOM SESSION STATS:")
+                for key, value in stats.items():
+                    print(f"   {key.replace('_', ' ').title()}: {value}")
             
         elif action == '5':
+            # Manual location change
+            print("\n📍 MANUAL LOCATION CHANGE")
+            print("Change to a specific city manually")
+            
+            print("\nQuick options:")
+            quick_cities = ["Istanbul, Turkey", "London, UK", "Paris, France", "Berlin, Germany", "New York, USA"]
+            for i, city in enumerate(quick_cities, 1):
+                print(f"   {i}. {city}")
+            
+            choice = input("\nEnter number (1-5) or type custom city name: ").strip()
+            
+            if choice.isdigit() and 1 <= int(choice) <= 5:
+                city_name = quick_cities[int(choice) - 1]
+            else:
+                city_name = choice
+            
+            if city_name:
+                print(f"\n🌍 Changing location to: {city_name}")
+                if geomatch_helper.change_location(city_name):
+                    print("✅ Location change successful!")
+                else:
+                    print("❌ Location change failed")
+            
+        elif action == '6':
             # Settings
             print("\n⚙️ SETTINGS & PREFERENCES")
             print("1. 🎂 Set Age Range")
-            print("2. 📍 Set Distance Range")
-            print("3. 💘 Set Gender Preference") 
+            print("2. 📍 Set Distance Range") 
+            print("3. 💘 Set Gender Preference")
             print("4. 🌍 Toggle Global Mode")
             print("5. ⬅️ Back to Main Menu")
             
@@ -259,9 +322,9 @@ def main():
                     print("❌ Invalid distance value")
                     
             elif setting == '3':
-                print("Select preference:")
+                print("Select your preference:")
                 print("1. 👩 Women")
-                print("2. 👨 Men")
+                print("2. 👨 Men") 
                 print("3. 🏳️‍🌈 Everyone")
                 pref = input("Preference: ").strip()
                 
@@ -280,7 +343,7 @@ def main():
                 session.set_global(global_mode)
                 print(f"✅ Global mode: {'Enabled' if global_mode else 'Disabled'}")
                 
-        elif action == '6':
+        elif action == '7':
             # Check matches
             print("\n💬 CHECKING YOUR MATCHES...")
             try:
@@ -288,26 +351,43 @@ def main():
                 
                 if matches:
                     print(f"✅ You have {len(matches)} new matches! 🎉")
+                    print("\n👥 Your New Matches:")
                     for i, match in enumerate(matches[:5], 1):
                         name = match.get_name() or "Unknown"
                         age = match.get_age() or "?"
-                        print(f"  {i}. {name}, {age}")
+                        distance = match.get_distance()
+                        dist_str = f" ({distance}km away)" if distance else ""
+                        print(f"  {i}. {name}, {age}{dist_str}")
                     
                     if len(matches) > 5:
                         print(f"  ... and {len(matches) - 5} more!")
+                    
+                    # Offer to send messages
+                    send_msg = input("\n💌 Send messages to matches? (y/n): ").lower()
+                    if send_msg == 'y':
+                        message = input("💬 Enter your message: ")
+                        if message.strip():
+                            for match in matches[:3]:  # Only first 3
+                                try:
+                                    session.send_message(match.get_chat_id(), message)
+                                    print(f"✅ Sent to {match.get_name()}")
+                                    time.sleep(2)
+                                except Exception as e:
+                                    print(f"❌ Failed to message {match.get_name()}: {e}")
                 else:
                     print("😔 No new matches found. Keep swiping!")
                     
             except Exception as e:
                 print(f"❌ Error checking matches: {e}")
                 
-        elif action == '7':
-            # Test enhanced features
-            print("\n🧪 TEST ENHANCED FEATURES")
+        elif action == '8':
+            # Test features
+            print("\n🧪 TEST FEATURES")
             print("1. 🔍 Test 'Out of Matches' Detection")
-            print("2. 👍 Test Smart Like Button")
+            print("2. 📍 Test Location Change")
             print("3. 🔧 Test Popup Dismissal")
-            print("4. ⬅️ Back to Main Menu")
+            print("4. 👍 Test Smart Like Button")
+            print("5. ⬅️ Back to Main Menu")
             
             test_choice = input("Test choice: ").strip()
             
@@ -315,18 +395,17 @@ def main():
                 print("🔍 Testing out of matches detection...")
                 if geomatch_helper.check_out_of_matches():
                     print("✅ Out of matches detected!")
-                    print("💡 This would trigger automatic location change in Smart modes")
                 else:
                     print("ℹ️ Still have matches available")
                     
             elif test_choice == '2':
-                print("👍 Testing smart like button...")
-                proceed = input("This will like one profile. Continue? (y/n): ").lower()
-                if proceed == 'y':
-                    if geomatch_helper.like():
-                        print("✅ Smart like successful!")
+                test_city = input("Enter city to test (e.g., 'Berlin, Germany'): ").strip()
+                if test_city:
+                    print(f"📍 Testing location change to {test_city}...")
+                    if geomatch_helper.change_location(test_city):
+                        print("✅ Location change test successful!")
                     else:
-                        print("⚠️ Like failed - no button available or out of profiles")
+                        print("❌ Location change test failed")
                         
             elif test_choice == '3':
                 print("🔧 Testing popup dismissal...")
@@ -334,15 +413,22 @@ def main():
                     print("✅ Popup found and dismissed!")
                 else:
                     print("ℹ️ No popup found to dismiss")
+                    
+            elif test_choice == '4':
+                print("👍 Testing smart like button...")
+                if geomatch_helper.like():
+                    print("✅ Like successful!")
+                else:
+                    print("⚠️ Like failed - no button available")
             
-        elif action == '8':
+        elif action == '9':
             print("\n👋 Thanks for using Hilal's Enhanced Smart Dating Bot!")
             print("🔒 All session data will be securely cleared")
             print("🇹🇷 Happy dating with smart automation! 💙")
             break
             
         else:
-            print("❌ Invalid choice. Please enter 1-8")
+            print("❌ Invalid choice. Please enter 1-9")
     
     return session
 
@@ -356,11 +442,9 @@ if __name__ == "__main__":
         print("👋 Goodbye!")
     except Exception as e:
         print(f"\n❌ Unexpected error occurred: {e}")
-        print("💡 Troubleshooting tips:")
-        print("   1. Update Chrome: chrome://settings/help")
-        print("   2. Run: pip install --upgrade undetected-chromedriver")
-        print("   3. Restart terminal and try again")
-        print("   4. Use option 1 (Quick Swipe) for basic functionality")
+        print("💡 Try restarting the bot or check your internet connection")
+        import traceback
+        traceback.print_exc()
     finally:
         print("\n🔒 Cleaning up and securing session data...")
         print("✅ All done! Your privacy is protected.")
