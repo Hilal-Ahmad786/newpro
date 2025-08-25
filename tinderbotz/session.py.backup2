@@ -34,7 +34,7 @@ from tinderbotz.helpers.storage_helper import StorageHelper
 from tinderbotz.helpers.email_helper import EmailHelper
 from tinderbotz.helpers.constants_helper import Printouts
 from tinderbotz.helpers.xpaths import *
-from tinderbotz.addproxy import get_proxy_extension
+from smart_dating_bot.addproxy import get_proxy_extension
 
 
 class Session:

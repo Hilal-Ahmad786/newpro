@@ -1,19 +1,29 @@
+# 🔐 Security - Never commit these files!
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+secrets/
+credentials/
+
 # Python
-venv/
-.env*
 __pycache__/
 *.pyc
-
-# Node/General
-node_modules/
-dist/
-.build/
-.next/
-*.log
-
-# macOS
-.DS_Store
-
-# Python venv
+.Python
+venv/
 .venv/
 
+# TinderBot data
+chrome_profile/
+secure_chrome_profile/
+proxy_auth_plugin.zip
+data/
+logs/
+session_data_*.json
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+*.swp

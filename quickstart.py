@@ -1,3 +1,7 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 '''
 Created by Frederikme (TeetiFM)
 '''
@@ -17,8 +21,8 @@ if __name__ == "__main__":
     session.set_custom_location(latitude=50.879829, longitude=4.700540)
     
     # replace this with your own email and password!
-    email = "example@gmail.com"
-    password = "password123"
+    email = os.getenv("TINDER_EMAIL", "your-email@gmail.com")
+    password = os.getenv("TINDER_PASSWORD", "your-password")
     
     # login using your google account with a verified email!
     session.login_using_google(email, password)
