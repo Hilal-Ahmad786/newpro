@@ -20,79 +20,215 @@ class GeomatchHelper:
         if "/app/recs" not in self.browser.current_url:
             self._get_home_page()
 
+    def _get_home_page(self):
+        self.browser.get(self.HOME_URL)
+        time.sleep(3)
+
     def like(self) -> bool:
         """
-        Enhanced like method that works with current Tinder interface
+        OPTIMIZED like method - uses fastest approach (keyboard)
         """
         try:
-            # Method 1: Try keyboard shortcut (most reliable)
-            from selenium.webdriver.common.keys import Keys
-            from selenium.webdriver.common.action_chains import ActionChains
-            
+            # Method 1: Keyboard shortcut (FASTEST - 0.1s)
             action = ActionChains(self.browser)
             action.send_keys(Keys.ARROW_RIGHT).perform()
-            print("✅ Like sent via keyboard shortcut")
-            time.sleep(1)
+            
+            # Minimal delay for UI update
+            time.sleep(0.1)  # Reduced from 1 second
             return True
             
-        except Exception as e1:
-            print(f"⚠️ Keyboard method failed: {e1}")
-            
-            # Method 2: Try multiple button selectors
-            like_selectors = [
-                # New Tinder like button
-                "//button[contains(@class, 'gamepad-button') and contains(@class, 'Bgc')]",
-                "//button[.//span[contains(text(), 'Like')]]",
-                "//button[@aria-label='Like']",
-                "//button[contains(@class, 'like')]",
-                "//button[.//svg[contains(@class, 'gamepad-icon')]]",
-                "//div[@role='button' and contains(@aria-label, 'Like')]",
-            ]
-            
-            for i, selector in enumerate(like_selectors, 1):
-                try:
-                    print(f"🎯 Trying like method {i}/{len(like_selectors)}...")
-                    
-                    WebDriverWait(self.browser, 3).until(
-                        EC.element_to_be_clickable((By.XPATH, selector))
-                    )
-                    
-                    like_button = self.browser.find_element(By.XPATH, selector)
-                    like_button.click()
-                    print(f"✅ Like successful with method {i}")
-                    time.sleep(1)
-                    return True
-                    
-                except Exception as e:
-                    continue
-            
-            # Method 3: JavaScript fallback
-            try:
-                print("🔧 Trying JavaScript click...")
-                result = self.browser.execute_script("""
-                    let buttons = document.querySelectorAll('button');
-                    for(let btn of buttons) {
-                        if(btn.innerHTML.includes('Like') || 
-                           btn.className.includes('like') || 
-                           btn.className.includes('gamepad')) {
-                            btn.click();
-                            return true;
-                        }
-                    }
-                    return false;
-                """)
-                
-                if result:
-                    print("✅ JavaScript click successful")
-                    time.sleep(1)
-                    return True
-                    
-            except Exception as e:
-                print(f"❌ JavaScript method failed: {e}")
-            
-            print("❌ All like methods failed")
-            return False
-            
         except Exception as e:
-            print(f"❌ Unexpected error in like method: {e}")
+            # Fallback: Try button click (slower but more reliable)
+            try:
+                like_selectors = [
+                    "//button[contains(@class, 'gamepad-button')]",
+                    "//button[@aria-label='Like']",
+                    "//button[.//svg[contains(@class, 'gamepad')]]"
+                ]
+                
+                for selector in like_selectors:
+                    try:
+                        btn = self.browser.find_element(By.XPATH, selector)
+                        btn.click()
+                        time.sleep(0.1)
+                        return True
+                    except:
+                        continue
+                        
+            except:
+                pass
+                
             return False
+
+    def dislike(self) -> bool:
+        """
+        OPTIMIZED dislike method - uses keyboard
+        """
+        try:
+            action = ActionChains(self.browser)
+            action.send_keys(Keys.ARROW_LEFT).perform()
+            
+            time.sleep(0.1)  # Minimal delay
+            return True
+            
+        except:
+            return False
+
+    def superlike(self):
+        try:
+            action = ActionChains(self.browser)
+            action.send_keys(Keys.ARROW_UP).perform()
+            time.sleep(0.1)
+            return True
+        except:
+            return False
+
+    def get_name(self):
+        try:
+            xpath = f'{content}/div/div[1]/div/main/div[1]/div/div/div[1]/div/div/div[3]/div[3]/div/div[1]/div/div/span'
+            element = self.browser.find_element(By.XPATH, xpath)
+            return element.text
+        except:
+            try:
+                # Alternative xpath
+                element = self.browser.find_element(By.XPATH, "//h1[@itemprop='name']")
+                return element.text
+            except:
+                return None
+
+    def get_age(self):
+        try:
+            xpath = f'{content}/div/div[1]/div/main/div[1]/div/div/div[1]/div/div/div[3]/div[3]/div/div[1]/div/span'
+            element = self.browser.find_element(By.XPATH, xpath)
+            age_text = element.text
+            # Extract number from text
+            age = int(''.join(filter(str.isdigit, age_text)))
+            return age
+        except:
+            return None
+
+    def get_bio_and_passions(self):
+        bio = None
+        passions = []
+        lifestyle = []
+        basics = []
+        anthem = None
+        looking_for = None
+        
+        try:
+            # Get bio
+            bio_xpath = f'{content}/div/div[1]/div/main/div[1]/div/div/div[1]/div/div/div[3]/div[3]/div/div[2]/div/div'
+            bio_element = self.browser.find_element(By.XPATH, bio_xpath)
+            bio = bio_element.text
+        except:
+            pass
+        
+        try:
+            # Get passions
+            passions_xpath = "//div[contains(@class, 'Bdrs(100px)')]"
+            passion_elements = self.browser.find_elements(By.XPATH, passions_xpath)
+            for element in passion_elements:
+                text = element.text
+                if text:
+                    passions.append(text)
+        except:
+            pass
+        
+        return bio, passions, lifestyle, basics, anthem, looking_for
+
+    def get_image_urls(self, quickload=True):
+        image_urls = []
+        
+        try:
+            # Get visible images
+            image_elements = self.browser.find_elements(By.XPATH, "//div[@aria-label='Profile slider']")
+            for element in image_elements:
+                style = element.get_attribute('style')
+                if 'background-image' in style:
+                    url = style.split('url("')[1].split('")')[0]
+                    if url not in image_urls:
+                        image_urls.append(url)
+            
+            if not quickload:
+                # Click through all images
+                try:
+                    bullets = self.browser.find_elements(By.CLASS_NAME, 'bullet')
+                    for bullet in bullets:
+                        bullet.click()
+                        time.sleep(0.5)
+                        
+                        # Get new images
+                        image_elements = self.browser.find_elements(By.XPATH, "//div[@aria-label='Profile slider']")
+                        for element in image_elements:
+                            style = element.get_attribute('style')
+                            if 'background-image' in style:
+                                url = style.split('url("')[1].split('")')[0]
+                                if url not in image_urls:
+                                    image_urls.append(url)
+                except:
+                    pass
+        except:
+            pass
+        
+        return image_urls
+
+    def get_insta(self, bio):
+        if bio:
+            # Look for Instagram handle pattern
+            pattern = r'@[\w.]+|(?:ig|instagram|insta)[:\s]+[\w.]+'
+            match = re.search(pattern, bio, re.IGNORECASE)
+            if match:
+                return match.group(0)
+        return None
+
+    def get_row_data(self):
+        rowdata = {}
+        
+        try:
+            # Look for location/distance
+            distance_elements = self.browser.find_elements(By.XPATH, "//div[contains(text(), 'kilometers away') or contains(text(), 'miles away')]")
+            if distance_elements:
+                text = distance_elements[0].text
+                # Extract number
+                distance = int(''.join(filter(str.isdigit, text.split()[0])))
+                rowdata['distance'] = distance
+        except:
+            rowdata['distance'] = None
+        
+        try:
+            # Look for other info rows
+            info_rows = self.browser.find_elements(By.XPATH, "//div[@class='Row']")
+            for row in info_rows:
+                text = row.text
+                if 'lives in' in text.lower():
+                    rowdata['home'] = text.replace('Lives in', '').strip()
+                elif 'works at' in text.lower() or 'works as' in text.lower():
+                    rowdata['work'] = text
+                elif 'studies' in text.lower() or 'went to' in text.lower():
+                    rowdata['study'] = text
+        except:
+            pass
+        
+        return rowdata
+
+    def handle_popups_fast(self):
+        """
+        OPTIMIZED popup handler - checks only common popups
+        """
+        # Quick check for most common popups only
+        common_popups = [
+            "//button[contains(text(), 'No Thanks')]",
+            "//button[contains(text(), 'Maybe Later')]",
+            "//button[@aria-label='Close']",
+            "//button[contains(text(), 'Not Interested')]"
+        ]
+        
+        for selector in common_popups:
+            try:
+                btn = self.browser.find_element(By.XPATH, selector)
+                btn.click()
+                return True
+            except:
+                continue
+        
+        return False

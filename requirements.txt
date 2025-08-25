@@ -1,11 +1,15 @@
-# Core dependencies (security updated)
+# Core dependencies (optimized & secured)
 selenium==4.15.0
 undetected-chromedriver==3.5.4
 webdriver-manager==4.0.1
+
+# Image processing (optional, can remove if not scraping)
 Pillow==10.3.0
-deepface==0.0.79
 opencv-python==4.8.1.78
 numpy==1.24.3
+
+# AI face analysis (optional, can remove if not needed)
+deepface==0.0.79
 
 # Security & Environment
 python-dotenv==1.0.0

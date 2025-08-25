@@ -1,11 +1,7 @@
 # Selenium: automation of browser
 from selenium import webdriver
 # from webdriver_manager.chrome import ChromeDriverManager
-try:
-    import undetected_chromedriver as uc  # modern
-except ModuleNotFoundError:
-    import undetected_chromedriver.v2 as uc  # fallback for old envs
-
+import undetected_chromedriver.v2 as uc
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -22,7 +18,7 @@ import requests
 import atexit
 from pathlib import Path
 
-# Smart Dating Bot: helper classes
+# Tinderbotz: helper classes
 from tinderbotz.helpers.geomatch import Geomatch
 from tinderbotz.helpers.match import Match
 from tinderbotz.helpers.profile_helper import ProfileHelper
@@ -40,7 +36,10 @@ from tinderbotz.addproxy import get_proxy_extension
 class Session:
     HOME_URL = "https://www.tinder.com/app/recs"
 
-    def __init__(self, headless=False, store_session=True, proxy=None, user_data=False):
+    # Add this to your tinderbotz/session.py file
+# Replace the __init__ method in the Session class with this:
+
+    def __init__(self, headless=False, store_session=False, proxy=None, user_data=False, incognito=True):
         self.email = None
         self.may_send_email = False
         self.session_data = {
@@ -67,7 +66,7 @@ class Session:
 
             # print out the statistics of the session
             try:
-                box = self._get_msg_box(lines=lines, title="Smart Dating Bot")
+                box = self._get_msg_box(lines=lines, title="TinderBot Session")
                 print(box)
             finally:
                 print("Started session: {}".format(self.started))
@@ -75,15 +74,24 @@ class Session:
                 print("Ended session: {}".format(y))
             
             # Close browser properly
-            self.browser.quit()
+            try:
+                self.browser.quit()
+            except:
+                pass
 
         # Go further with the initialisation
         # Setting some options of the browser here below
 
         options = uc.ChromeOptions()
 
+        # FORCE INCOGNITO MODE
+        if incognito:
+            options.add_argument("--incognito")
+            print("🕵️ Starting browser in INCOGNITO mode...")
+            store_session = False  # Don't store session in incognito mode
+
         # Create empty profile to avoid annoying Mac Popup
-        if store_session:
+        if store_session and not incognito:
             if not user_data:
                 user_data = f"{Path().absolute()}/chrome_profile/"
             if not os.path.isdir(user_data):
@@ -92,9 +100,20 @@ class Session:
             Path(f'{user_data}First Run').touch()
             options.add_argument(f"--user-data-dir={user_data}")
 
-        #options.add_argument("--start-maximized")
+        # Browser options
+        options.add_argument("--start-maximized")
         options.add_argument('--no-first-run --no-service-autorun --password-store=basic')
         options.add_argument("--lang=en-GB")
+        
+        # Privacy options for incognito
+        if incognito:
+            options.add_argument("--disable-plugins-discovery")
+            options.add_argument("--disable-extensions")
+            options.add_argument("--disable-blink-features=AutomationControlled")
+            
+        # Disable automation detection
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
 
         if headless:
             options.headless = True
@@ -115,20 +134,35 @@ class Session:
                 options.add_argument(f'--proxy-server=http://{proxy}')
 
         # Getting the chromedriver from cache or download it from internet
-        print("Getting ChromeDriver ...")
-        self.browser = uc.Chrome(options=options)  # ChromeDriverManager().install(),
-        # self.browser = webdriver.Chrome(options=options)
-        # self.browser.set_window_size(1250, 750)
-
-        # clear the console based on the operating system you're using
-        #os.system('cls' if os.name == 'nt' else 'clear')
-
+        print("🔧 Getting ChromeDriver ...")
+        self.browser = uc.Chrome(options=options)
+        
+        # Additional stealth settings
+        self.browser.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+        
+        if incognito:
+            print("✅ Browser started in INCOGNITO mode")
+            print("🔒 No data will be saved after session ends")
+        
         # Cool banner
-        print(Printouts.BANNER.value)
+        print("\n" + "="*50)
+        print("🤖 TINDERBOT - INCOGNITO MODE" if incognito else "🤖 TINDERBOT")
+        print("="*50)
         time.sleep(1)
 
         self.started = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        print("Started session: {}\n\n".format(self.started))
+        print("Started session: {}\n".format(self.started))
+
+
+
+
+
+
+
+
+
+
+
 
     # Setting a custom location
     def set_custom_location(self, latitude, longitude, accuracy="100%"):
@@ -171,91 +205,6 @@ class Session:
         helper.add_photo(filepath)
 
     # Actions of the session
-    
-    def login_manually(self, timeout_minutes=10):
-        """
-        Manual login - waits for user to login manually in browser
-        
-        Args:
-            timeout_minutes: How long to wait for manual login (default: 10 minutes)
-        
-        Returns:
-            bool: True if login successful, False if timeout or failed
-        """
-        print("\n🔑 MANUAL LOGIN MODE")
-        print("=" * 60)
-        print("🌐 Please login to Tinder manually in the browser window.")
-        print("🤖 The bot will wait and automatically detect when you're logged in.")
-        print(f"⏰ Timeout: {timeout_minutes} minutes")
-        print("💡 Tip: Use incognito mode for better security")
-        print("=" * 60)
-        
-        # Navigate to Tinder login page
-        if not "tinder" in self.browser.current_url:
-            print("🌍 Opening Tinder website...")
-            self.browser.get("https://tinder.com/")
-            time.sleep(3)
-        
-        # Check if already logged in
-        if self._is_logged_in():
-            print("✅ Already logged in! Proceeding...")
-            self._handle_potential_popups()
-            return True
-        
-        start_time = time.time()
-        timeout_seconds = timeout_minutes * 60
-        
-        print("⏳ Waiting for you to complete login...")
-        print("💻 Please login in the browser window that opened")
-        print("🔄 Checking login status every few seconds...\n")
-        
-        last_message_time = 0
-        
-        while not self._is_logged_in():
-            current_time = time.time()
-            elapsed = current_time - start_time
-            remaining = int(timeout_seconds - elapsed)
-            
-            # Check timeout
-            if elapsed > timeout_seconds:
-                print("\n⏰ Login timeout reached!")
-                print("💡 You can:")
-                print("   - Try again with: session.login_manually()")
-                print("   - Increase timeout: session.login_manually(timeout_minutes=15)")
-                return False
-            
-            # Show status every 15 seconds
-            if current_time - last_message_time >= 15:
-                minutes = remaining // 60
-                seconds = remaining % 60
-                print(f"⏳ Still waiting... {minutes:02d}:{seconds:02d} remaining")
-                
-                # Give helpful hints
-                if elapsed > 60:  # After 1 minute
-                    print("💡 Make sure you:")
-                    print("   - Click 'Log in' on the Tinder homepage")
-                    print("   - Complete any captchas or verification steps")
-                    print("   - Allow location permissions if asked")
-                
-                last_message_time = current_time
-            
-            time.sleep(2)  # Check every 2 seconds
-        
-        print("\n🎉 LOGIN SUCCESSFUL!")
-        print("🤖 Bot detected successful login. Initializing...")
-        
-        # Handle any popups that appear after login
-        time.sleep(3)
-        self._handle_potential_popups()
-        
-        print("✅ Smart Dating Bot is ready to use!")
-        print("💡 You can now use commands like:")
-        print("   - session.like(amount=5)")
-        print("   - session.get_geomatch()")
-        print("   - session.get_new_matches()")
-        
-        return True
-
     def login_using_google(self, email, password):
         self.email = email
         if not self._is_logged_in():
